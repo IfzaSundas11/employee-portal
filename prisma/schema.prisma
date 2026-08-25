@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  PENDING
+  ACKNOWLEDGED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Task {
+  id             String     @id @default(uuid())
+  title          String
+  description    String?
+  priority       String     @default("Medium")
+  assignee       String
+  assigneeEmail  String?
+  status         TaskStatus @default(PENDING)
+  createdAt      DateTime   @default(now())
+  dueDate        DateTime?
+  acknowledgedAt DateTime?
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // e.g., "CREATE_EMPLOYEE", "UPDATE_SALARY", "DELETE_USER"
+  details   String?  // Action ki extra detail (JSON string ya description)
+  userId    String?  // Jis user ne action perform kiya
+  createdAt DateTime @default(now())
+}
