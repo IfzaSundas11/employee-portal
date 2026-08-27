@@ -2,122 +2,154 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  CheckSquare, 
-  FileText, 
-  BarChart3, 
-  Settings, 
-  Bell, 
+import { usePathname, useRouter } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  CheckSquare,
+  FileText,
+  BarChart3,
+  Settings,
+  LogOut,
+  Bell,
+  Search,
+  Menu,
   Building2,
-  LogOut
 } from "lucide-react";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
   const router = useRouter();
+  
+  // Sidebar state (Default desktop par open)
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/login/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    try {
+      await fetch("/api/auth/login/logout", { method: "POST" });
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
-  return (
-    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
-      
-      {/* DARK SIDEBAR */}
-      <aside className={`${sidebarOpen ? "w-64" : "w-0 overflow-hidden"} bg-[#111625] text-slate-300 flex flex-col justify-between p-4 shadow-xl z-20 transition-all duration-300`}>
-        <div>
-          {/* Company Brand Header */}
-          <div className="flex items-center gap-3 px-3 py-4 mb-6 border-b border-slate-800">
-            <div className="w-9 h-9 bg-purple-600/30 border border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center font-bold">
-              <Building2 size={20} />
-            </div>
-            <span className="text-lg font-bold text-white tracking-wide">Company</span>
-          </div>
+  const navItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Employees", href: "/dashboard/employees", icon: Users },
+    { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
+    { name: "Audit Logs", href: "/dashboard/audit", icon: FileText },
+    { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  ];
 
-          {/* Navigation Links */}
-          <nav className="space-y-1">
-            <Link href="/dashboard" className="flex items-center gap-3.5 px-4 py-3 text-sm font-semibold text-white bg-purple-600 rounded-xl shadow-lg shadow-purple-600/30 transition-all">
-              <LayoutDashboard size={18} />
-              Dashboard
-            </Link>
-            <Link href="/admin/employees" className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all">
-              <Users size={18} />
-              Employees
-            </Link>
-            <Link href="/dashboard/tasks" className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all">
-              <CheckSquare size={18} />
-              Tasks
-            </Link>
-            <Link href="/admin/audit-logs" className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all">
-              <FileText size={18} />
-              Audit Logs
-            </Link>
-            <Link href="/reports" className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all">
-              <BarChart3 size={18} />
-              Reports
-            </Link>
-            <Link href="/settings" className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all">
-              <Settings size={18} />
-              Settings
-            </Link>
-          </nav>
+  return (
+    <div className="flex h-screen bg-slate-50 font-sans antialiased overflow-hidden">
+      {/* Sidebar with Smooth Slide Animation */}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 transition-all duration-300 ease-in-out ${
+          sidebarOpen 
+            ? "w-64 translate-x-0" 
+            : "-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 lg:overflow-hidden"
+        }`}
+      >
+        {/* Logo Section */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/80 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-md shadow-indigo-600/30">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <span className="font-bold text-lg text-white tracking-wide">
+              Company
+            </span>
+          </div>
         </div>
 
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                    : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                }`}
+              >
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+
         {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all w-full"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+        <div className="p-4 border-t border-slate-800/80 shrink-0">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors whitespace-nowrap"
+          >
+            <LogOut className="w-5 h-5 shrink-0" />
+            Logout
+          </button>
+        </div>
       </aside>
 
-      {/* RIGHT SIDE */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        
-        {/* TOP NAVBAR */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between sticky top-0 z-10">
+        {/* Top Header */}
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30 sticky top-0 shrink-0">
           <div className="flex items-center gap-4">
-            {/* Hamburger Toggle Button */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-slate-500 hover:text-slate-800 p-1 rounded-lg"
+              className="text-slate-600 hover:text-slate-900 focus:outline-none p-2 rounded-xl hover:bg-slate-100 transition-colors"
+              title="Toggle Sidebar"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Menu className="w-6 h-6" />
             </button>
+            <div className="relative hidden sm:block w-72">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search anything..."
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-700 placeholder-slate-400 transition-all"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <button className="relative text-slate-500 hover:text-purple-600 transition-colors">
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-600 rounded-full border-2 border-white"></span>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white" />
             </button>
 
-            {/* Profile Pill */}
-            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-              <div className="w-9 h-9 bg-purple-100 text-purple-700 font-bold rounded-full flex items-center justify-center text-sm border border-purple-200">
+            <div className="h-8 w-[1px] bg-slate-200 mx-1" />
+
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm ring-2 ring-indigo-600/10">
                 AU
               </div>
-              <div className="text-left leading-tight">
-                <p className="text-sm font-bold text-slate-800">Admin User</p>
-                <p className="text-[11px] font-semibold text-slate-400">Super Admin</p>
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-semibold text-slate-800 leading-none">
+                  Admin User
+                </p>
+                <p className="text-xs text-slate-400 mt-1 font-medium leading-none">
+                  Super Admin
+                </p>
               </div>
             </div>
           </div>
         </header>
 
-        {/* MAIN CONTENT */}
-        <main className="flex-1 overflow-y-auto p-8 bg-slate-50/50">
-          {children}
-        </main>
+        {/* Main Workspace */}
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
