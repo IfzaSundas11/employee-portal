@@ -8,22 +8,13 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  passwordHash  String
-  role          String         @default("EMPLOYEE")
-  status        String         @default("ACTIVE")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  refreshTokens RefreshToken[]
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  username  String   @unique
+  firstName String
+  lastName  String
+  phone     String?  // '?' mark makes this optional
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
-  expiresAt DateTime
-  status    String   @default("ACTIVE")
+  updatedAt DateTime @updatedAt
 }

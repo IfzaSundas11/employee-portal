@@ -24,14 +24,20 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // Sidebar state (Default desktop par open)
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/login/logout", { method: "POST" });
-      router.push("/login");
+      // 1. Correct API path: /api/auth/logout
+      await fetch("/api/auth/logout", { method: "POST" });
+
+      // 2. Clear client side cookie fallback
+      document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      // 3. Force page reload to login
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -51,8 +57,8 @@ export default function DashboardLayout({
       {/* Sidebar with Smooth Slide Animation */}
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 transition-all duration-300 ease-in-out ${
-          sidebarOpen 
-            ? "w-64 translate-x-0" 
+          sidebarOpen
+            ? "w-64 translate-x-0"
             : "-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 lg:overflow-hidden"
         }`}
       >

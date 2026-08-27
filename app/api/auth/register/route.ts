@@ -4,22 +4,26 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const body = await req.json();
+    const { username, firstName, lastName, phone, email, password } = body;
 
-    if (!name || !email || !password) {
+    // Phone condition is removed from backend validation check
+    if (!username || !firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: "Username, First Name, Last Name, Email, and Password are required." },
         { status: 400 }
       );
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "User with this email already exists" },
+        { message: "User with this email or username already exists." },
         { status: 409 }
       );
     }
@@ -28,7 +32,10 @@ export async function POST(req: Request) {
 
     const newUser = await prisma.user.create({
       data: {
-        name,
+        username,
+        firstName,
+        lastName,
+        phone: phone || null, // Optional handling
         email,
         password: hashedPassword,
       },
@@ -36,16 +43,27 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        message: "Account created successfully!",
-        user: { id: newUser.id, email: newUser.email },
+        message: "Staff account created successfully!",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+        },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Register Error:", error);
+    console.error("Register API Error:", error);
     return NextResponse.json(
-      { message: "Something went wrong during registration" },
+      { message: "Internal server error during registration." },
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { message: "Register API route is active. Please submit registration via POST request." },
+    { status: 200 }
+  );
 }
