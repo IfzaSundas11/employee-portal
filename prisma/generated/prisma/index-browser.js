@@ -143,6 +143,16 @@ exports.Prisma.EmployeeScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.AttendanceScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  date: 'date',
+  checkIn: 'checkIn',
+  checkOut: 'checkOut',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -161,7 +171,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   Department: 'Department',
-  Employee: 'Employee'
+  Employee: 'Employee',
+  Attendance: 'Attendance'
 };
 
 /**

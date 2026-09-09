@@ -18,15 +18,29 @@ model Department {
 }
 
 model Employee {
-  id           String      @id @default(cuid())
+  id           String       @id @default(cuid())
   name         String
-  email        String      @unique
+  email        String       @unique
   phone        String?
   address      String?
   designation  String
   joiningDate  DateTime
-  status       String      @default("Active")
-  department   Department  @relation(fields: [departmentId], references: [id])
+  status       String       @default("Active")
+  department   Department   @relation(fields: [departmentId], references: [id])
   departmentId String
-  createdAt    DateTime    @default(now())
+  createdAt    DateTime     @default(now())
+  attendances  Attendance[]
+}
+
+model Attendance {
+  id         String   @id @default(cuid())
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String
+  date       DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  status     String   @default("Present")
+  createdAt  DateTime @default(now())
+
+  @@unique([employeeId, date])
 }
