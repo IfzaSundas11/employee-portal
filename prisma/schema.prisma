@@ -37,10 +37,38 @@ model Attendance {
   employee   Employee @relation(fields: [employeeId], references: [id])
   employeeId String
   date       DateTime
-  checkIn    DateTime?
-  checkOut   DateTime?
+  checkIn   DateTime?
+  checkOut  DateTime?
   status     String   @default("Present")
   createdAt  DateTime @default(now())
 
   @@unique([employeeId, date])
+}
+
+enum TaskStatus {
+  PENDING
+  ACKNOWLEDGED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Task {
+  id             String     @id @default(uuid())
+  title          String
+  description    String?
+  priority       String     @default("Medium")
+  assignee       String
+  assigneeEmail  String?
+  status         TaskStatus @default(PENDING)
+  createdAt      DateTime   @default(now())
+  dueDate        DateTime?
+  acknowledgedAt DateTime?
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   String?
+  userId    String?
+  createdAt DateTime @default(now())
 }
