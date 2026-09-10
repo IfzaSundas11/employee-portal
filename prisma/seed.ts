@@ -1,4 +1,5 @@
 import { PrismaClient } from "./generated/prisma";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,22 @@ async function main() {
   }
 
   console.log("Departments seeded successfully.");
+
+  const passwordHash = await hash("admin123", 10);
+
+  const user = await prisma.user.upsert({
+    where: { email: "admin@company.com" },
+    update: {},
+    create: {
+      username: "admin",
+      firstName: "Admin",
+      lastName: "User",
+      email: "admin@company.com",
+      password: passwordHash,
+    },
+  });
+
+  console.log("Test user created:", user.email);
 }
 
 main()
@@ -29,4 +46,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-  })
+  });

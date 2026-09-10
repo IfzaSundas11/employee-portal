@@ -13,8 +13,10 @@
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.9.1",
     "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "exceljs": "^4.4.0",
+    "jose": "^6.2.9",
     "lucide-react": "^1.34.0",
     "next": "16.3.1",
     "next-swagger-doc": "^0.4.1",
@@ -29,7 +31,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.19.43",
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -40,10 +43,14 @@
     "eslint-config-next": "16.3.1",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "allowScripts": {
     "@prisma/client@5.22.0": true,
     "prisma@5.22.0": true
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   }
 }
