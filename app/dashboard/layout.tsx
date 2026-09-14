@@ -1,161 +1,193 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  CheckSquare,
-  FileText,
-  BarChart3,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  Menu,
+  ListTodo,
+  CalendarCheck,
   Building2,
+  FileText,
+  Settings,
 } from "lucide-react";
+
+type NavItem = {
+  name: string;
+  href: string;
+  icon: any;
+};
+
+const navItems: NavItem[] = [
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    name: "Employees",
+    href: "/employees",
+    icon: Users,
+  },
+  {
+    name: "Tasks",
+    href: "/tasks",
+    icon: ListTodo,
+  },
+  {
+    name: "Attendance",
+    href: "/attendance",
+    icon: CalendarCheck,
+  },
+  {
+    name: "Departments",
+    href: "/departments",
+    icon: Building2,
+  },
+  {
+    name: "Audit Logs",
+    href: "/audit",
+    icon: FileText,
+  },
+  {
+    name: "Reports",
+    href: "/reports",
+    icon: FileText,
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    icon: Settings,
+  },
+];
+
+type DashboardLayoutProps = {
+  children: React.ReactNode;
+};
 
 export default function DashboardLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: DashboardLayoutProps) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  // Sidebar state (Default desktop par open)
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const handleLogout = async () => {
-    try {
-      // 1. Correct API path: /api/auth/logout
-      await fetch("/api/auth/logout", { method: "POST" });
-
-      // 2. Clear client side cookie fallback
-      document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      // 3. Force page reload to login
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
-
-  const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Employees", href: "/dashboard/employees", icon: Users },
-    { name: "Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-    { name: "Audit Logs", href: "/dashboard/audit", icon: FileText },
-    { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  ];
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans antialiased overflow-hidden">
-      {/* Sidebar with Smooth Slide Animation */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 transition-all duration-300 ease-in-out ${
-          sidebarOpen
-            ? "w-64 translate-x-0"
-            : "-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 lg:overflow-hidden"
-        }`}
-      >
-        {/* Logo Section */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/80 shrink-0">
+    <div className="flex min-h-screen bg-slate-100">
+
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-slate-950 text-white shadow-xl">
+
+        {/* Logo */}
+        <div className="flex h-20 items-center border-b border-slate-800 px-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-md shadow-indigo-600/30">
-              <Building2 className="w-5 h-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-900/30">
+              <Users className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg text-white tracking-wide">
-              Company
-            </span>
+
+            <div>
+              <h1 className="text-lg font-bold">
+                StaffPortal
+              </h1>
+
+              <p className="text-[11px] text-slate-400">
+                Employee Management
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            Main Menu
+          </p>
+
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+
+            const isActive =
+              pathname === item.href ||
+              pathname.startsWith(item.href + "/");
+
             return (
               <Link
-                key={item.name}
+                key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${
                   isActive
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                    : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                    : "text-slate-400 hover:bg-slate-900 hover:text-white"
                 }`}
               >
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
-                {item.name}
+                <Icon
+                  className={`h-5 w-5 shrink-0 ${
+                    isActive
+                      ? "text-white"
+                      : "text-slate-500 group-hover:text-white"
+                  }`}
+                />
+
+                <span>{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Logout Button */}
-        <div className="p-4 border-t border-slate-800/80 shrink-0">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors whitespace-nowrap"
-          >
-            <LogOut className="w-5 h-5 shrink-0" />
-            Logout
-          </button>
+        {/* Sidebar Footer */}
+        <div className="border-t border-slate-800 p-4">
+          <div className="rounded-xl bg-slate-900 p-3">
+            <p className="text-xs font-semibold text-slate-300">
+              StaffPortal V2.0
+            </p>
+
+            <p className="mt-1 text-[10px] text-slate-500">
+              Employee Management System
+            </p>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* Main Area */}
+      <div className="ml-64 flex min-h-screen flex-1 flex-col">
+
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30 sticky top-0 shrink-0">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-slate-600 hover:text-slate-900 focus:outline-none p-2 rounded-xl hover:bg-slate-100 transition-colors"
-              title="Toggle Sidebar"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            <div className="relative hidden sm:block w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search anything..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-700 placeholder-slate-400 transition-all"
-              />
-            </div>
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 shadow-sm">
+
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">
+              Employee Portal
+            </h2>
+
+            <p className="text-xs text-slate-500">
+              Manage your organization efficiently
+            </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white" />
-            </button>
+          {/* Right Side */}
+          <div className="flex items-center gap-3">
 
-            <div className="h-8 w-[1px] bg-slate-200 mx-1" />
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-semibold text-slate-800">
+                Administrator
+              </p>
 
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm ring-2 ring-indigo-600/10">
-                AU
-              </div>
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-slate-800 leading-none">
-                  Admin User
-                </p>
-                <p className="text-xs text-slate-400 mt-1 font-medium leading-none">
-                  Super Admin
-                </p>
-              </div>
+              <p className="text-xs text-slate-500">
+                Portal Admin
+              </p>
             </div>
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">
+              A
+            </div>
+
           </div>
         </header>
 
-        {/* Main Workspace */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        {/* Page Content */}
+        <main className="flex-1">
+          {children}
+        </main>
+
       </div>
     </div>
   );

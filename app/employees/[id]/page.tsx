@@ -12,9 +12,11 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   MapPin,
-  
   ShieldCheck,
   Clock3,
+  History,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
 export default function EmployeeProfilePage() {
@@ -25,6 +27,16 @@ export default function EmployeeProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Attendance states
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toISOString().slice(0, 7)
+  );
+  const [attendanceDays, setAttendanceDays] = useState<any[]>([]);
+  const [presentCount, setPresentCount] = useState(0);
+  const [absentCount, setAbsentCount] = useState(0);
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+
+  // Load employee
   useEffect(() => {
     async function loadEmployee() {
       try {
@@ -47,6 +59,63 @@ export default function EmployeeProfilePage() {
 
     loadEmployee();
   }, [params.id]);
+
+  // Load attendance for this employee
+  useEffect(() => {
+    if (!params.id || !selectedMonth) return;
+
+    async function loadAttendance() {
+      try {
+        setAttendanceLoading(true);
+
+        const res = await fetch(
+          "/api/attendance/history?employeeId=" +
+            params.id +
+            "&month=" +
+            selectedMonth
+        );
+
+        if (!res.ok) {
+          setAttendanceDays([]);
+          setPresentCount(0);
+          setAbsentCount(0);
+          return;
+        }
+
+        const data = await res.json();
+
+        setAttendanceDays(data.days || []);
+        setPresentCount(data.presentCount || 0);
+        setAbsentCount(data.absentCount || 0);
+      } catch (err) {
+        console.error("Attendance loading error:", err);
+        setAttendanceDays([]);
+        setPresentCount(0);
+        setAbsentCount(0);
+      } finally {
+        setAttendanceLoading(false);
+      }
+    }
+
+    loadAttendance();
+  }, [params.id, selectedMonth]);
+
+  function formatDate(dateStr: string) {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+    });
+  }
+
+  function formatTime(dateStr: string | null) {
+    if (!dateStr) return "-";
+
+    return new Date(dateStr).toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
   if (loading) {
     return (
@@ -136,7 +205,6 @@ export default function EmployeeProfilePage() {
       icon: IdCard,
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
-      full: false,
     },
     {
       label: "Department",
@@ -144,7 +212,6 @@ export default function EmployeeProfilePage() {
       icon: Building2,
       iconBg: "bg-indigo-50",
       iconColor: "text-indigo-600",
-      full: false,
     },
     {
       label: "Email",
@@ -152,7 +219,6 @@ export default function EmployeeProfilePage() {
       icon: Mail,
       iconBg: "bg-green-50",
       iconColor: "text-green-600",
-      full: false,
     },
     {
       label: "Phone",
@@ -160,7 +226,6 @@ export default function EmployeeProfilePage() {
       icon: Phone,
       iconBg: "bg-sky-50",
       iconColor: "text-sky-600",
-      full: false,
     },
     {
       label: "Designation",
@@ -168,7 +233,6 @@ export default function EmployeeProfilePage() {
       icon: BriefcaseBusiness,
       iconBg: "bg-orange-50",
       iconColor: "text-orange-500",
-      full: false,
     },
     {
       label: "Joining Date",
@@ -176,7 +240,6 @@ export default function EmployeeProfilePage() {
       icon: CalendarDays,
       iconBg: "bg-pink-50",
       iconColor: "text-pink-500",
-      full: false,
     },
   ];
 
@@ -221,7 +284,7 @@ export default function EmployeeProfilePage() {
 
               {/* Decorative circles */}
               <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-white/10" />
-              <div className="absolute right-16 -bottom-20 h-40 w-40 rounded-full bg-white/10" />
+              <div className="absolute -bottom-20 right-16 h-40 w-40 rounded-full bg-white/10" />
               <div className="absolute right-40 top-10 h-20 w-20 rounded-full bg-white/5" />
 
               <div className="relative flex flex-col gap-7 sm:flex-row sm:items-center">
@@ -235,6 +298,7 @@ export default function EmployeeProfilePage() {
                 <div className="text-white">
                   <div className="mb-1 flex items-center gap-2">
                     <UserRound className="h-4 w-4 text-blue-100" />
+
                     <p className="text-sm font-medium text-blue-100">
                       Employee
                     </p>
@@ -264,6 +328,7 @@ export default function EmployeeProfilePage() {
                         isActive ? "bg-green-500" : "bg-pink-500"
                       }`}
                     />
+
                     {employee.status || "Unknown"}
                   </span>
                 </div>
@@ -329,6 +394,7 @@ export default function EmployeeProfilePage() {
                 {/* Status Card */}
                 <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                   <div className="flex items-start gap-4">
+
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50">
                       <ShieldCheck className="h-5 w-5 text-green-600" />
                     </div>
@@ -352,15 +418,18 @@ export default function EmployeeProfilePage() {
                               : "bg-pink-500"
                           }`}
                         />
+
                         {employee.status || "Unknown"}
                       </span>
                     </div>
+
                   </div>
                 </div>
 
                 {/* Member Since */}
                 <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                   <div className="flex items-start gap-4">
+
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50">
                       <Clock3 className="h-5 w-5 text-indigo-600" />
                     </div>
@@ -374,12 +443,14 @@ export default function EmployeeProfilePage() {
                         {joiningDate}
                       </p>
                     </div>
+
                   </div>
                 </div>
 
                 {/* Address */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:border-blue-200 hover:shadow-md md:col-span-2">
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md md:col-span-2">
                   <div className="flex items-start gap-4">
+
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-50">
                       <MapPin className="h-5 w-5 text-purple-600" />
                     </div>
@@ -393,7 +464,181 @@ export default function EmployeeProfilePage() {
                         {employee.address || "Not provided"}
                       </p>
                     </div>
+
                   </div>
+                </div>
+              </div>
+
+              {/* ================================================= */}
+              {/* ATTENDANCE HISTORY */}
+              {/* ================================================= */}
+
+              <div className="mt-10">
+
+                {/* Attendance Heading */}
+                <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
+                      <History className="h-6 w-6 text-blue-600" />
+                    </div>
+
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-900">
+                        Attendance History
+                      </h2>
+
+                      <p className="mt-0.5 text-sm text-slate-500">
+                        Attendance records for {employee.name}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Month Selector */}
+                  <div>
+                    <input
+                      type="month"
+                      value={selectedMonth}
+                      onChange={(e) =>
+                        setSelectedMonth(e.target.value)
+                      }
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Attendance Summary */}
+                <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                  {/* Present */}
+                  <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+                      <CheckCircle2 className="h-6 w-6 text-green-600" />
+                    </div>
+
+                    <div>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {presentCount}
+                      </p>
+
+                      <p className="text-sm text-slate-500">
+                        Days Present
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Absent */}
+                  <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
+                      <XCircle className="h-6 w-6 text-red-500" />
+                    </div>
+
+                    <div>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {absentCount}
+                      </p>
+
+                      <p className="text-sm text-slate-500">
+                        Days Absent
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Attendance Table */}
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+                  <div className="flex items-center gap-2 border-b border-slate-100 px-6 py-4">
+                    <CalendarDays className="h-4 w-4 text-slate-400" />
+
+                    <h3 className="font-bold text-slate-900">
+                      Daily Breakdown
+                    </h3>
+                  </div>
+
+                  {attendanceLoading ? (
+                    <div className="p-12 text-center text-slate-400">
+                      Loading attendance...
+                    </div>
+                  ) : attendanceDays.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <CalendarDays className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+
+                      <p className="font-medium text-slate-500">
+                        No attendance data for this month.
+                      </p>
+
+                      <p className="mt-1 text-xs text-slate-400">
+                        Try selecting another month.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+
+                        <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
+                          <tr>
+                            <th className="px-6 py-3 text-left font-semibold">
+                              Date
+                            </th>
+
+                            <th className="px-6 py-3 text-left font-semibold">
+                              Check In
+                            </th>
+
+                            <th className="px-6 py-3 text-left font-semibold">
+                              Check Out
+                            </th>
+
+                            <th className="px-6 py-3 text-left font-semibold">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-slate-100">
+
+                          {attendanceDays.map(function (day) {
+                            const isPresent =
+                              day.status === "Present";
+
+                            return (
+                              <tr
+                                key={day.date}
+                                className="transition hover:bg-slate-50"
+                              >
+                                <td className="px-6 py-4 font-medium text-slate-900">
+                                  {formatDate(day.date)}
+                                </td>
+
+                                <td className="px-6 py-4 text-slate-600">
+                                  {formatTime(day.checkIn)}
+                                </td>
+
+                                <td className="px-6 py-4 text-slate-600">
+                                  {formatTime(day.checkOut)}
+                                </td>
+
+                                <td className="px-6 py-4">
+                                  <span
+                                    className={
+                                      "inline-flex rounded-full px-2.5 py-1 text-xs font-medium " +
+                                      (isPresent
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-red-100 text-red-700")
+                                    }
+                                  >
+                                    {day.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -408,13 +653,12 @@ export default function EmployeeProfilePage() {
                   Back to Employees
                 </button>
 
-               
               </div>
 
             </div>
           </div>
 
-          {/* Small footer */}
+          {/* Footer */}
           <div className="mt-5 text-center text-xs text-slate-500">
             StaffPortal • Employee Management System
           </div>

@@ -153,6 +153,39 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.TaskScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  assignee: 'assignee',
+  assigneeEmail: 'assigneeEmail',
+  status: 'status',
+  createdAt: 'createdAt',
+  dueDate: 'dueDate',
+  acknowledgedAt: 'acknowledgedAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  details: 'details',
+  userId: 'userId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  phone: 'phone',
+  email: 'email',
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -167,12 +200,20 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.TaskStatus = exports.$Enums.TaskStatus = {
+  PENDING: 'PENDING',
+  ACKNOWLEDGED: 'ACKNOWLEDGED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED'
+};
 
 exports.Prisma.ModelName = {
   Department: 'Department',
   Employee: 'Employee',
-  Attendance: 'Attendance'
+  Attendance: 'Attendance',
+  Task: 'Task',
+  AuditLog: 'AuditLog',
+  User: 'User'
 };
 
 /**
