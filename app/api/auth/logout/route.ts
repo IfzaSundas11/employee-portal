@@ -5,6 +5,7 @@ export async function POST() {
   try {
     const cookieStore = await cookies();
     cookieStore.delete("auth_token");
+    cookieStore.delete("user_role");
 
     const response = NextResponse.json(
       { message: "Logged out successfully" },
@@ -12,6 +13,12 @@ export async function POST() {
     );
 
     response.cookies.set("auth_token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      path: "/",
+    });
+
+    response.cookies.set("user_role", "", {
       httpOnly: true,
       expires: new Date(0),
       path: "/",

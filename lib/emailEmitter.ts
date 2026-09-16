@@ -6,10 +6,12 @@ export const emailEmitter = new EventEmitter();
 
 // 2. Nodemailer Transporter Config
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.resend.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Gmail App Password
+    user: "resend",
+    pass: process.env.RESEND_API_KEY,
   },
 });
 

@@ -41,7 +41,14 @@ export default function LoginPage() {
       }
 
       // Force full page redirection to trigger cookies instantly and bypass redirect loops
-      window.location.href = "/dashboard";
+      
+      if (data.user?.role === "ADMIN") {
+        window.location.href = "/dashboard";
+      } else if (data.employeeId) {
+        window.location.href = "/employees/" + data.employeeId;
+      } else {
+        window.location.href = "/profile";
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

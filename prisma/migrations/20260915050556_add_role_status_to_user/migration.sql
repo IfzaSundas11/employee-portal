@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "passwordHash" TEXT,
+ADD COLUMN     "role" TEXT NOT NULL DEFAULT 'EMPLOYEE',
+ADD COLUMN     "status" TEXT NOT NULL DEFAULT 'ACTIVE';

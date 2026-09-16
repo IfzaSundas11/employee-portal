@@ -35,14 +35,32 @@ export async function POST(req: Request) {
       );
     }
 
-    // Set Auth Cookie so Middleware allows access
+    // Set Auth Cookies
     const cookieStore = await cookies();
     cookieStore.set("auth_token", user.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24,
       path: "/",
     });
+
+    cookieStore.set("user_role", user.role, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24,
+      path: "/",
+    });
+
+    // If this user is an Employee (not Admin), try to find their matching Employee record
+    let employeeId: string | null = null;
+
+    if (user.role !== "ADMIN") {
+      const employee = await prisma.employee.findUnique({
+        where: { email: user.email },
+        select: { id: true },
+      });
+      employeeId = employee?.id || null;
+    }
 
     return NextResponse.json(
       {
@@ -51,7 +69,9 @@ export async function POST(req: Request) {
           id: user.id,
           username: user.username,
           email: user.email,
+          role: user.role,
         },
+        employeeId,
       },
       { status: 200 }
     );

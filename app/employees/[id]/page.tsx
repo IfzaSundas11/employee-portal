@@ -19,6 +19,7 @@ import {
   XCircle,
 } from "lucide-react";
 
+
 export default function EmployeeProfilePage() {
   const params = useParams();
   const router = useRouter();
@@ -34,7 +35,87 @@ export default function EmployeeProfilePage() {
   const [attendanceDays, setAttendanceDays] = useState<any[]>([]);
   const [presentCount, setPresentCount] = useState(0);
   const [absentCount, setAbsentCount] = useState(0);
-  const [attendanceLoading, setAttendanceLoading] = useState(false);
+    const [attendanceLoading, setAttendanceLoading] = useState(false);
+    const [isSelf, setIsSelf] = useState(false);
+const [selfRecord, setSelfRecord] = useState<any>(null);
+const [selfActionLoading, setSelfActionLoading] = useState(false);
+const [selfMessage, setSelfMessage] = useState("");
+
+
+  // Security check: make sure this user is allowed to view this employee's page
+  useEffect(() => {
+    async function checkAccess() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
+        const data = await res.json();
+
+        if (data.role !== "ADMIN" && data.employeeId !== params.id) {
+          router.push("/profile");
+          return;
+        }
+
+        if (data.role !== "ADMIN" && data.employeeId === params.id) {
+          setIsSelf(true);
+          loadSelfAttendance();
+        }
+      } catch (error) {
+        console.error("Access check failed:", error);
+        router.push("/login");
+      }
+    }
+
+    checkAccess();
+  }, [params.id, router]);
+
+  async function loadSelfAttendance() {
+    try {
+      const now = new Date();
+      const today =
+        now.getFullYear() +
+        "-" +
+        String(now.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(now.getDate()).padStart(2, "0");
+
+      const res = await fetch("/api/attendance?date=" + today);
+      const data = await res.json();
+      const mine = data.find((rec: any) => rec.employeeId === params.id);
+      setSelfRecord(mine || null);
+    } catch (error) {
+      console.error("Failed to load today's attendance:", error);
+    }
+  }
+
+  async function handleSelfAction(action: string) {
+    setSelfActionLoading(true);
+    setSelfMessage("");
+    try {
+      const res = await fetch("/api/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: params.id, action }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSelfMessage(data.error || "Something went wrong");
+        return;
+      }
+
+      setSelfMessage(
+        action === "check-in" ? "Checked in successfully!" : "Checked out successfully!"
+      );
+      loadSelfAttendance();
+    } catch (error) {
+      setSelfMessage("Something went wrong");
+    } finally {
+      setSelfActionLoading(false);
+    }
+  }
 
   // Load employee
   useEffect(() => {
@@ -275,6 +356,61 @@ export default function EmployeeProfilePage() {
               Employee Profile
             </div>
           </div>
+          {isSelf && (
+            <div className="mb-6 rounded-2xl border border-blue-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-bold text-slate-900">
+                Today's Attendance
+              </h3>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => handleSelfAction("check-in")}
+                  disabled={selfActionLoading || !!selfRecord}
+                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Check In
+                </button>
+
+                <button
+                  onClick={() => handleSelfAction("check-out")}
+                  disabled={selfActionLoading || !selfRecord || !!selfRecord?.checkOut}
+                  className="flex items-center gap-2 rounded-lg bg-slate-700 px-5 py-2.5 font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                >
+                  Check Out
+                </button>
+
+                {selfRecord && (
+                  <div className="text-sm text-slate-600">
+                    Checked in at{" "}
+                    <b>
+                      {selfRecord.checkIn
+                        ? new Date(selfRecord.checkIn).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "-"}
+                    </b>
+                    {selfRecord.checkOut && (
+                      <>
+                        {" "}
+                        ┬╖ Checked out at{" "}
+                        <b>
+                          {new Date(selfRecord.checkOut).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </b>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {selfMessage && (
+                <p className="mt-3 text-sm text-slate-600">{selfMessage}</p>
+              )}
+            </div>
+          )}
 
           {/* Main Profile Card */}
           <div className="overflow-hidden rounded-3xl border border-white/80 bg-white shadow-xl shadow-slate-900/10">
