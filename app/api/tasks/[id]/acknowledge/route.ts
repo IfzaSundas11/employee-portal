@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const taskId = params.id;
+    const { id } = await params;
 
     const updatedTask = await prisma.task.update({
-      where: { id: taskId },
+      where: { id },
       data: {
         status: "ACKNOWLEDGED",
         acknowledgedAt: new Date(),

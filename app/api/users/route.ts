@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 
 // GET - Get all users
@@ -37,7 +37,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -49,14 +48,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash password
+    const normalizedEmail = String(email).trim();
+    const baseUsername = normalizedEmail.split("@")[0] || "user";
+    const username = `${baseUsername}_${Date.now()}`;
     const passwordHash = await hash(password, 10);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
-        email,
-        passwordHash,
+        username,
+        firstName: "User",
+        lastName: "Account",
+        email: normalizedEmail,
+        password: passwordHash,
         role: role || "EMPLOYEE",
         status: "ACTIVE",
       },
