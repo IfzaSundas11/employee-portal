@@ -742,10 +742,9 @@ export default function TasksPage() {
                                   </span>
 
                                   {task.acknowledgedAt && (
-                                    <CheckCircle2
-                                      className="ml-1 h-3.5 w-3.5 text-green-500"
-                                      title="Acknowledged"
-                                    />
+                                    <span aria-label="Acknowledged" title="Acknowledged">
+                                      <CheckCircle2 className="ml-1 h-3.5 w-3.5 text-green-500" />
+                                    </span>
                                   )}
                                 </div>
                               </div>
