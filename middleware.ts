@@ -6,17 +6,16 @@ export function middleware(request: NextRequest) {
   const role = request.cookies.get("user_role")?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. If logged in and trying to access login/signup -> Redirect based on role
+  // 1. If user is authenticated and attempts to access authentication routes, redirect based on role
   if (token && (pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(
       new URL(role === "ADMIN" ? "/dashboard" : "/profile", request.url)
     );
   }
 
-  // 2. Routes that require login
+  // 2. Define protected routes that require active authentication
   const protectedRoutes = [
     "/dashboard",
-    "/admin",
     "/profile",
     "/employees",
     "/departments",
@@ -28,20 +27,20 @@ export function middleware(request: NextRequest) {
   ];
   const isProtected = protectedRoutes.some((route) => pathname.startsWith(route));
 
+  // Redirect unauthenticated users attempting to access protected routes to login
   if (!token && isProtected) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // 3. Employee-only exception: allow /employees/:id (their own detail page)
+  // 3. Exception rule: Allow employees to view their specific detail route (/employees/:id)
   const isEmployeeDetailPage =
     pathname.startsWith("/employees/") && pathname !== "/employees";
 
-  // 4. If logged in but NOT an admin -> block admin-only routes
+  // 4. Restrict admin-only routes for non-admin roles
   if (token && role !== "ADMIN") {
     const adminOnlyRoutes = [
       "/dashboard",
-      "/admin",
-      "/employees", // covers the LIST page "/employees" exactly
+      "/employees",
       "/departments",
       "/attendance",
       "/tasks",
@@ -64,8 +63,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/dashboard",
     "/dashboard/:path*",
-    "/admin/:path*",
     "/profile/:path*",
     "/employees/:path*",
     "/departments/:path*",

@@ -102,16 +102,16 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <p className="text-slate-500 text-sm">Loading profile...</p>
+      <div className="p-8 bg-white dark:bg-slate-950 min-h-screen">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Loading profile...</p>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="p-8">
-        <p className="text-red-500 text-sm">
+      <div className="p-8 bg-white dark:bg-slate-950 min-h-screen">
+        <p className="text-red-500 dark:text-red-400 text-sm">
           Could not load profile. Please make sure you're logged in.
         </p>
       </div>
@@ -121,45 +121,45 @@ export default function ProfilePage() {
   const fullName = `${profile.firstName} ${profile.lastName}`.trim() || profile.username;
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">My Profile</h1>
+    <div className="p-8 bg-white dark:bg-slate-950 min-h-screen">
+      <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">My Profile</h1>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 max-w-2xl overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 max-w-2xl overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-blue-600 to-blue-400" />
 
         <div className="px-8 pb-8">
           <div className="-mt-12 mb-4">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-600 border-4 border-white shadow-md">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 text-3xl font-bold text-blue-600 dark:text-blue-400 border-4 border-white dark:border-slate-900 shadow-md">
               {fullName.charAt(0).toUpperCase()}
             </div>
           </div>
 
           {!isEditing ? (
             <>
-              <h2 className="text-xl font-bold text-slate-800">{fullName}</h2>
-              <p className="text-sm text-slate-500 mb-6">{profile.role}</p>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white">{fullName}</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{profile.role}</p>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-slate-400" />
-                  <span className="text-slate-600">{profile.email}</span>
+                  <span className="text-slate-600 dark:text-slate-300">{profile.email}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
                   <Phone className="h-4 w-4 text-slate-400" />
-                  <span className="text-slate-600">
+                  <span className="text-slate-600 dark:text-slate-300">
                     {profile.phone || "No phone number added"}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
                   <Shield className="h-4 w-4 text-slate-400" />
-                  <span className="text-slate-600">{profile.role}</span>
+                  <span className="text-slate-600 dark:text-slate-300">{profile.role}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
                   <Calendar className="h-4 w-4 text-slate-400" />
-                  <span className="text-slate-600">
+                  <span className="text-slate-600 dark:text-slate-300">
                     Joined {new Date(profile.createdAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleChangePassword}
                   disabled={pwLoading}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition disabled:opacity-50"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition disabled:opacity-50"
                 >
                   {pwLoading ? "Sending..." : "Change Password"}
                 </button>
@@ -184,49 +184,49 @@ export default function ProfilePage() {
             </>
           ) : (
             <>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Edit Profile</h2>
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Edit Profile</h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">First Name</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">First Name</label>
                   <input
                     type="text"
                     value={form.firstName}
                     onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                    className="w-full mt-1 px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full mt-1 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Last Name</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Last Name</label>
                   <input
                     type="text"
                     value={form.lastName}
                     onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                    className="w-full mt-1 px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full mt-1 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Phone</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone</label>
                   <input
                     type="text"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full mt-1 px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full mt-1 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="03xxxxxxxxx"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Email</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
                   <input
                     type="email"
                     value={profile.email}
                     disabled
-                    className="w-full mt-1 px-4 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-400"
+                    className="w-full mt-1 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                   />
-                  <p className="text-xs text-slate-400 mt-1">Email cannot be changed here.</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Email cannot be changed here.</p>
                 </div>
               </div>
 
@@ -240,7 +240,7 @@ export default function ProfilePage() {
                       phone: profile.phone || "",
                     });
                   }}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
                   Cancel
                 </button>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
           )}
 
           {message && (
-            <p className="mt-4 text-sm text-slate-600">{message}</p>
+            <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">{message}</p>
           )}
         </div>
       </div>

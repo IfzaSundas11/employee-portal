@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/auditLog";
 
 export async function GET() {
   try {
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
       },
       include: { department: true },
     });
+
+    // Audit Log Record
+    await createAuditLog(
+      "EMPLOYEE_CREATED",
+      `Admin added new employee "${employee.name}" to ${employee.department?.name || "a department"}`,
+      "Admin"
+    );
 
     return NextResponse.json(employee, { status: 201 });
   } catch (err: any) {

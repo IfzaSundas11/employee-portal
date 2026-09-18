@@ -56,18 +56,19 @@ export default function DashboardLayout({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
- async function handleLogout() {
-  try {
-    await fetch("/api/auth/logout", { method: "POST" });
-  } catch (error) {
-    console.error("Logout failed:", error);
-  } finally {
-    router.push("/login");
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      router.push("/login");
+    }
   }
-}
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex min-h-screen bg-slate-100 dark:bg-slate-950">
+
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-slate-950 text-white shadow-xl">
         <div className="flex h-20 items-center border-b border-slate-800 px-6">
@@ -120,22 +121,22 @@ export default function DashboardLayout({
       </aside>
 
       <div className="ml-64 flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 shadow-sm">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-8 shadow-sm">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Employee Portal</h2>
-            <p className="text-xs text-slate-500">Manage your organization efficiently</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Employee Portal</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Manage your organization efficiently</p>
           </div>
 
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-slate-100"
+              className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               <div className="hidden text-right sm:block">
-                <p className="text-sm font-semibold text-slate-800">Administrator</p>
-                <p className="text-xs text-slate-500">Portal Admin</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">Administrator</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Portal Admin</p>
               </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 font-bold text-blue-600 dark:text-blue-400">
                 A
               </div>
               <ChevronDown
@@ -146,16 +147,16 @@ export default function DashboardLayout({
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                <div className="border-b border-slate-100 px-4 py-3">
-                  <p className="text-sm font-semibold text-slate-800">Administrator</p>
-                  <p className="text-xs text-slate-500">admin@company.com</p>
+              <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-white">Administrator</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">admin@company.com</p>
                 </div>
 
                 <Link
                   href="/profile"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   <User className="h-4 w-4 text-slate-400" />
                   Profile
@@ -164,17 +165,15 @@ export default function DashboardLayout({
                 <Link
                   href="/admin/users"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   <Shield className="h-4 w-4 text-slate-400" />
                   Admin Portal
                 </Link>
 
-                
-
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-3 border-t border-slate-100 px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50"
+                  className="flex w-full items-center gap-3 border-t border-slate-100 dark:border-slate-800 px-4 py-3 text-left text-sm text-red-600 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-950"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout

@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-export async function createAuditLog(action: string, details?: string, userId?: string) {
+export async function createAuditLog(action: string, details?: string, userId?: string)  {
   try {
     await prisma.auditLog.create({
       data: {
